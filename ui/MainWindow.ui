@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QMainWindow {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+        stop:0 #0a0a0a, stop:0.3 #1a1a2e, stop:0.7 #16213e, stop:1 #0f3460);
+    color: #ffffff;
+}
+
+QWidget {
+    background: transparent;
+    color: #ffffff;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 10pt;
+}
+
+QLabel {
+    color: #00ffff;
+    font-weight: bold;
+    text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+}
+
+QComboBox {
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #00ffff;
+    border-radius: 8px;
+    padding: 8px;
+    color: #ffffff;
+    font-weight: bold;
+    selection-background-color: #00ffff;
+    selection-color: #000000;
+}
+
+QComboBox:hover {
+    border-color: #00ffff;
+    box-shadow: 0 0 15px #00ffff;
+}
+
+QComboBox::drop-down {
+    border: none;
+    width: 20px;
+}
+
+QComboBox::down-arrow {
+    image: none;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #00ffff;
+    margin-right: 5px;
+}
+
+QTextEdit {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #00ffff;
+    border-radius: 10px;
+    padding: 15px;
+    color: #ffffff;
+    font-size: 11pt;
+    line-height: 1.5;
+    selection-background-color: #00ffff;
+    selection-color: #000000;
+}
+
+QTextEdit:focus {
+    border-color: #00ffff;
+    box-shadow: 0 0 20px #00ffff;
+}
+
+QSlider::groove:horizontal {
+    border: 2px solid #00ffff;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 4px;
+    margin: 2px 0;
+}
+
+QSlider::handle:horizontal {
+    background: qradialgradient(cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5,
+        stop:0 #ffffff, stop:0.3 #00ffff, stop:1 #0080ff);
+    border: 2px solid #00ffff;
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    margin: -6px 0;
+    box-shadow: 0 0 10px #00ffff;
+}
+
+QSlider::handle:horizontal:hover {
+    background: qradialgradient(cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5,
+        stop:0 #ffffff, stop:0.3 #00ffff, stop:1 #00ffff);
+    box-shadow: 0 0 15px #00ffff, 0 0 25px #00ffff;
+}
+
+QSlider::sub-page:horizontal {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 #00ffff, stop:1 #0080ff);
+    border-radius: 4px;
+}
+
+QPushButton {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #1a1a2e, stop:1 #16213e);
+    border: 2px solid #00ffff;
+    border-radius: 10px;
+    padding: 12px 20px;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 14pt;
+    min-width: 60px;
+    min-height: 50px;
+}
+
+QPushButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #00ffff, stop:1 #0080ff);
+    color: #000000;
+    box-shadow: 0 0 15px #00ffff, 0 0 25px #00ffff;
+    transform: scale(1.05);
+}
+
+QPushButton:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #0080ff, stop:1 #00ffff);
+    border-color: #ffffff;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+QPushButton:disabled {
+    background: rgba(100, 100, 100, 0.3);
+    border-color: #666666;
+    color: #666666;
+}
+
+QMenuBar {
+    background: rgba(0, 0, 0, 0.8);
+    border-bottom: 2px solid #00ffff;
+    color: #ffffff;
+}
+
+QMenuBar::item {
+    background: transparent;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin: 2px;
+}
+
+QMenuBar::item:selected {
+    background: rgba(0, 255, 255, 0.3);
+    border: 1px solid #00ffff;
+    box-shadow: 0 0 10px #00ffff;
+}
+
+QMenuBar::item:pressed {
+    background: rgba(0, 255, 255, 0.5);
+    border: 1px solid #00ffff;
+}
+
+QMenu {
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #00ffff;
+    border-radius: 8px;
+    padding: 5px;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+QMenu::item {
+    background: transparent;
+    padding: 8px 20px;
+    border-radius: 4px;
+    margin: 2px;
+}
+
+QMenu::item:selected {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #00ffff, stop:1 #0080ff);
+    color: #000000;
+    box-shadow: 0 0 10px #00ffff;
+}
+
+QMenu::separator {
+    height: 2px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 transparent, stop:0.5 #00ffff, stop:1 transparent);
+    margin: 5px 10px;
+}
+
+QStatusBar {
+    background: rgba(0, 0, 0, 0.8);
+    border-top: 2px solid #00ffff;
+    color: #00ffff;
+}</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Список голосов:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QComboBox" name="VoicesList">
+        <property name="minimumSize">
+         <size>
+          <width>512</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QTextEdit" name="textBrowser">
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="placeholderText">
+       <string>Введите текст здесь...</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Скорость воспроизведения:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSlider" name="ValueSpeed">
+        <property name="minimum">
+         <number>10</number>
+        </property>
+        <property name="maximum">
+         <number>20</number>
+        </property>
+        <property name="pageStep">
+         <number>2</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="PrintValueSpeed">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QPushButton" name="BtnPrevious">
+        <property name="text">
+         <string>⏪</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="BtnStop">
+        <property name="text">
+         <string>⏹️</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="BtnPausePlay">
+        <property name="text">
+         <string>⏯️</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="BtnNext">
+        <property name="text">
+         <string>⏩</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>38</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>Файл</string>
+    </property>
+    <addaction name="ActOpen"/>
+    <addaction name="ActSave"/>
+    <addaction name="separator"/>
+    <addaction name="ActExit"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Справка</string>
+    </property>
+    <addaction name="ActAbout"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="ActOpen">
+   <property name="text">
+    <string>Открыть</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="ActSave">
+   <property name="text">
+    <string>Сохранить</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="ActExit">
+   <property name="text">
+    <string>Выход</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="text">
+    <string>Копировать</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="text">
+    <string>Вставить</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionSelectAll">
+   <property name="text">
+    <string>Выделить все</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="ActAbout">
+   <property name="text">
+    <string>О программе</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
