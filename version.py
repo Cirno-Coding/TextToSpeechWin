@@ -1,0 +1,5 @@
+VERSION = "1.0.0"
+VERSION_NAME = "Alpha"
+BUILD_DATE = "2024-01-15"
+AUTHOR = "Cirno-Coding"
+GITHUB_URL = "https://github.com/Cirno-Coding/TextToSpeechWin" 

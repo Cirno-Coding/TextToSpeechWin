@@ -399,30 +399,6 @@ QStatusBar {
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="actionCopy">
-   <property name="text">
-    <string>Копировать</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+C</string>
-   </property>
-  </action>
-  <action name="actionPaste">
-   <property name="text">
-    <string>Вставить</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+V</string>
-   </property>
-  </action>
-  <action name="actionSelectAll">
-   <property name="text">
-    <string>Выделить все</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+A</string>
-   </property>
-  </action>
   <action name="ActAbout">
    <property name="text">
     <string>О программе 💡</string>

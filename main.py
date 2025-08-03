@@ -2,16 +2,126 @@ import sys
 import os
 import win32com.client
 from datetime import datetime
-from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
-from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QTextCursor, QTextCharFormat, QColor
+from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
+from PyQt6.QtCore import Qt, QTimer, QUrl
+from PyQt6.QtGui import QTextCursor, QTextCharFormat, QColor, QFont, QDesktopServices
 from ui.MainWindow import Ui_MainWindow
+from version import VERSION, VERSION_NAME, BUILD_DATE, AUTHOR, GITHUB_URL
+
+
+class AboutDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("О программе")
+        self.setFixedSize(500, 400)
+        self.setModal(True)
+        
+        # Настройка стиля окна
+        self.setStyleSheet("""
+            QDialog {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                    stop:0 #0a0a0a, stop:0.3 #1a1a2e, stop:0.7 #16213e, stop:1 #0f3460);
+                color: #ffffff;
+            }
+            QLabel {
+                color: #ffffff;
+                background: transparent;
+            }
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #1a1a2e, stop:1 #16213e);
+                border: 2px solid #00ffff;
+                border-radius: 10px;
+                padding: 8px 16px;
+                color: #ffffff;
+                font-weight: bold;
+                min-width: 80px;
+            }
+            QPushButton:hover {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #00ffff, stop:1 #0080ff);
+                color: #000000;
+                box-shadow: 0 0 15px #00ffff;
+            }
+        """)
+        
+        self.setup_ui()
+    
+    def setup_ui(self):
+        layout = QVBoxLayout()
+        
+        # Название приложения (большими буквами и жирным шрифтом)
+        title_font = QFont()
+        title_font.setPointSize(18)
+        title_font.setBold(True)
+        
+        title_label = QLabel("TEXT-TO-SPEECH WINDOWS APPLICATION")
+        title_label.setFont(title_font)
+        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        title_label.setStyleSheet("color: #00ffff; margin: 20px; font-size: 20px;")
+        layout.addWidget(title_label)
+        
+        # Версия приложения (мелким шрифтом)
+        version_font = QFont()
+        version_font.setPointSize(10)
+        
+        version_text = f"{VERSION_NAME} - {VERSION} - {BUILD_DATE} : {AUTHOR}"
+        version_label = QLabel(version_text)
+        version_label.setFont(version_font)
+        version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        version_label.setStyleSheet("color: #cccccc; margin: 10px;")
+        layout.addWidget(version_label)
+        
+        # Описание функционала
+        description = """
+        Приложение для преобразования текста в речь с использованием Windows SAPI.
+        
+        Основные возможности:
+        • Преобразование текста в речь с русскими голосами
+        • Управление воспроизведением (воспроизведение, пауза, остановка)
+        • Навигация по тексту (переход между предложениями)
+        • Визуальное выделение текущего воспроизводимого текста
+        • Регулировка скорости воспроизведения
+        • Работа с файлами (сохранение и загрузка)
+        • Современный интерфейс с темной темой
+        """
+        
+        desc_label = QLabel(description)
+        desc_label.setWordWrap(True)
+        desc_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        desc_label.setStyleSheet("color: #ffffff; margin: 20px; line-height: 1.5;")
+        layout.addWidget(desc_label)
+        
+        # Кнопки
+        button_layout = QHBoxLayout()
+        
+        # Кнопка GitHub
+        github_btn = QPushButton("GitHub")
+        github_btn.clicked.connect(self.open_github)
+        button_layout.addWidget(github_btn)
+        
+        button_layout.addStretch()
+        
+        # Кнопка закрытия
+        close_btn = QPushButton("Закрыть")
+        close_btn.clicked.connect(self.accept)
+        button_layout.addWidget(close_btn)
+        
+        layout.addLayout(button_layout)
+        self.setLayout(layout)
+    
+    def open_github(self):
+        """Открытие ссылки на GitHub"""
+        QDesktopServices.openUrl(QUrl(GITHUB_URL))
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        
+        # Устанавливаем фиксированный размер окна
+        self.setFixedSize(800, 600)
 
         self.voice_list = []
         self.speaker = None
@@ -113,6 +223,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.ActOpen.triggered.connect(self.open_file)
         self.ActSave.triggered.connect(self.save_file)
         self.ActExit.triggered.connect(self.exit_application)
+        self.ActAbout.triggered.connect(self.show_about_dialog)
 
     def update_speed_label(self):
         """
@@ -502,6 +613,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         # Закрываем приложение
         self.close()
+
+    def show_about_dialog(self):
+        """
+        Показывает диалог "О программе"
+        """
+        about_dialog = AboutDialog(self)
+        about_dialog.exec()
 
 
 if __name__ == "__main__":
