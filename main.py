@@ -1,6 +1,8 @@
 import sys
+import os
 import win32com.client
-from PyQt6.QtWidgets import QApplication, QMainWindow
+from datetime import datetime
+from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QTextCursor, QTextCharFormat, QColor
 from ui.MainWindow import Ui_MainWindow
@@ -106,6 +108,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         # Обработчик изменения текста
         self.textBrowser.textChanged.connect(self.update_button_states)
+        
+        # Подключение действий меню
+        self.ActOpen.triggered.connect(self.open_file)
+        self.ActSave.triggered.connect(self.save_file)
+        self.ActExit.triggered.connect(self.exit_application)
 
     def update_speed_label(self):
         """
@@ -394,6 +401,107 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         # Обновляем состояние кнопок
         self.update_button_states()
+
+    def save_file(self):
+        """
+        Сохранение текста в файл
+        """
+        try:
+            text_content = self.textBrowser.toPlainText()
+            if text_content:
+                # Создаем папку texts, если её нет
+                texts_dir = os.path.join(os.getcwd(), "texts")
+                if not os.path.exists(texts_dir):
+                    os.makedirs(texts_dir)
+
+                # Генерируем имя файла по умолчанию
+                current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                default_filename = f"Текст от {current_time}.txt"
+                default_path = os.path.join(texts_dir, default_filename)
+
+                # Открываем диалог сохранения
+                file_path, _ = QFileDialog.getSaveFileName(
+                    self,
+                    "Сохранить текст",
+                    default_path,
+                    "Текстовые файлы (*.txt)"
+                )
+
+                if file_path:
+                    # Сохраняем содержимое QTextEdit в файл
+                    with open(file_path, 'w', encoding='utf-8') as file:
+                        file.write(text_content)
+
+                    # Очищаем QTextEdit
+                    self.textBrowser.clear()
+
+                    # Останавливаем воспроизведение, если оно активно
+                    if self.is_playing or self.is_pause:
+                        self.stop_playback()
+                
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Ошибка при сохранении файла: {e}")
+
+    def open_file(self):
+        """
+        Открытие текстового файла
+        """
+        try:
+            # Проверяем, есть ли текст в QTextEdit
+            current_text = self.textBrowser.toPlainText().strip()
+            
+            if current_text:
+                # Спрашиваем пользователя о сохранении текущего текста
+                reply = QMessageBox.question(
+                    self,
+                    "Сохранить текст",
+                    "Хотите сохранить текущий текст?",
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                    QMessageBox.StandardButton.Yes
+                )
+                
+                if reply == QMessageBox.StandardButton.Yes:
+                    # Сохраняем текущий текст
+                    self.save_file()
+                    # Если пользователь отменил сохранение, не открываем новый файл
+                    if self.textBrowser.toPlainText().strip():
+                        return
+                else:
+                    # Очищаем QTextEdit
+                    self.textBrowser.clear()
+                    # Останавливаем воспроизведение, если оно активно
+                    if self.is_playing or self.is_pause:
+                        self.stop_playback()
+            
+            # Открываем диалог выбора файла
+            file_path, _ = QFileDialog.getOpenFileName(
+                self,
+                "Открыть текстовый файл",
+                os.path.join(os.getcwd(), "texts"),
+                "Текстовые файлы (*.txt)"
+            )
+            
+            if file_path:
+                # Читаем содержимое файла
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    text_content = file.read()
+                
+                # Загружаем текст в QTextEdit
+                self.textBrowser.setPlainText(text_content)
+                
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Ошибка при открытии файла: {e}")
+
+    def exit_application(self):
+        """
+        Выход из приложения
+        """
+        # Останавливаем воспроизведение, если оно активно
+        if self.is_playing or self.is_pause:
+            self.stop_playback()
+        
+        # Закрываем приложение
+        self.close()
 
 
 if __name__ == "__main__":
