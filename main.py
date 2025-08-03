@@ -1,7 +1,8 @@
 import sys
 import win32com.client
 from PyQt6.QtWidgets import QApplication, QMainWindow
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtGui import QTextCursor, QTextCharFormat, QColor
 from ui.MainWindow import Ui_MainWindow
 
 
@@ -14,14 +15,52 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.speaker = None
         self.is_playing = False
         self.is_pause = False
-        self.pause_position = 0
+        
+        # Новые переменные для управления воспроизведением
+        self.sentences = []
+        self.sentence_positions = []  # Позиции предложений в тексте
+        self.current_sentence_index = 0
+        self.current_text = ""
+        self.playback_timer = QTimer()
+        self.playback_timer.timeout.connect(self.check_playback_status)
+        
+        # Форматы для выделения текста
+        self.highlight_format = QTextCharFormat()
+        self.highlight_format.setBackground(QColor(0, 255, 255, 100))  # Полупрозрачный голубой
+        self.highlight_format.setForeground(QColor(0, 0, 0))  # Черный текст
+        
+        self.normal_format = QTextCharFormat()
+        self.normal_format.setBackground(QColor(0, 0, 0, 0))  # Прозрачный фон
+        self.normal_format.setForeground(QColor(255, 255, 255))  # Белый текст
 
         # Инициализация объектов
         self.setup_voices()
         self.setup_connections()
         self.update_speed_label()
+        self.update_button_states()
 
         self.textBrowser.setAcceptRichText(False)
+
+    def update_button_states(self):
+        """
+        Обновление состояния кнопок в зависимости от статуса воспроизведения
+        """
+        has_text = bool(self.textBrowser.toPlainText().strip())
+        can_control = has_text and (self.is_playing or self.is_pause)
+        
+        # Кнопка остановки активна только при наличии текста и активном воспроизведении/паузе
+        self.BtnStop.setEnabled(can_control)
+        
+        # Кнопки навигации активны только при наличии текста и активном воспроизведении/паузе
+        # и только если можно перейти к предыдущему/следующему предложению
+        can_go_previous = can_control and self.sentences and self.current_sentence_index > 0
+        can_go_next = can_control and self.sentences and self.current_sentence_index < len(self.sentences) - 1
+        
+        self.BtnPrevious.setEnabled(can_go_previous)
+        self.BtnNext.setEnabled(can_go_next)
+        
+        # Кнопка воспроизведения активна только при наличии текста
+        self.BtnPausePlay.setEnabled(has_text)
 
     def setup_voices(self):
         """
@@ -64,6 +103,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.BtnStop.clicked.connect(self.stop_playback)
         self.BtnPrevious.clicked.connect(self.previous_phrase)
         self.BtnNext.clicked.connect(self.next_phrase)
+        
+        # Обработчик изменения текста
+        self.textBrowser.textChanged.connect(self.update_button_states)
 
     def update_speed_label(self):
         """
@@ -78,6 +120,74 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             except Exception as e:
                 print(f"Ошибка: {e}")
 
+    def split_text_into_sentences(self, text):
+        """
+        Разбиение текста на предложения с отслеживанием позиций
+        """
+        sentences = []
+        positions = []
+        current_sentence = ""
+        current_start = 0
+        
+        for i, char in enumerate(text):
+            current_sentence += char
+            if char in '.!?,:;':
+                sentences.append(current_sentence.strip())
+                positions.append((current_start, i + 1))
+                current_sentence = ""
+                current_start = i + 1
+        
+        # Добавляем оставшийся текст, если он есть
+        if current_sentence.strip():
+            sentences.append(current_sentence.strip())
+            positions.append((current_start, len(text)))
+        
+        # Убираем пустые строки
+        filtered_sentences = []
+        filtered_positions = []
+        for sentence, pos in zip(sentences, positions):
+            if sentence:
+                filtered_sentences.append(sentence)
+                filtered_positions.append(pos)
+        
+        return filtered_sentences, filtered_positions
+
+    def highlight_current_sentence(self):
+        """
+        Выделение текущего предложения в тексте
+        """
+        if not self.sentences or self.current_sentence_index >= len(self.sentence_positions):
+            return
+            
+        # Сначала убираем все выделения
+        self.clear_highlights()
+        
+        # Выделяем текущее предложение
+        start_pos, end_pos = self.sentence_positions[self.current_sentence_index]
+        
+        cursor = self.textBrowser.textCursor()
+        cursor.setPosition(start_pos)
+        cursor.setPosition(end_pos, QTextCursor.MoveMode.KeepAnchor)
+        
+        # Применяем формат выделения
+        cursor.mergeCharFormat(self.highlight_format)
+        
+        # Прокручиваем к выделенному тексту
+        self.textBrowser.setTextCursor(cursor)
+        self.textBrowser.ensureCursorVisible()
+
+    def clear_highlights(self):
+        """
+        Убирает все выделения из текста
+        """
+        cursor = self.textBrowser.textCursor()
+        cursor.select(QTextCursor.SelectionType.Document)
+        cursor.mergeCharFormat(self.normal_format)
+        
+        # Возвращаем курсор в начало
+        cursor.setPosition(0)
+        self.textBrowser.setTextCursor(cursor)
+
     def toggle_play_pause(self):
         """
         Переключение воспроизведения/паузы
@@ -89,7 +199,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if not self.is_playing and not self.is_pause:
                 self.start_playback()
             elif self.is_playing:
-                self.plause_playback()
+                self.pause_playback()
             elif self.is_pause:
                 self.resume_playback()
         except Exception as e:
@@ -111,75 +221,179 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 print("Голос не выбран")
                 return
 
+            # Разбиваем текст на предложения с позициями
+            self.sentences, self.sentence_positions = self.split_text_into_sentences(text)
+            self.current_sentence_index = 0
+            self.current_text = text
+
+            if not self.sentences:
+                print("Нет предложений для воспроизведения")
+                return
+
             self.speaker.Voice = selected_voice
             speed_value = self.ValueSpeed.value() / 10
             self.speaker.Rate = int((speed_value - 1) * 10)
-            self.speaker.Speak(text, 1)
+
+            # Начинаем воспроизведение с первого предложения
+            self.play_current_sentence()
 
             self.is_playing = True
-
             self.BtnPausePlay.setText("⏸️")
+            
+            # Запускаем таймер для отслеживания статуса воспроизведения
+            self.playback_timer.start(100)  # Проверяем каждые 100мс
+            
+            # Обновляем состояние кнопок
+            self.update_button_states()
+
         except Exception as e:
             print(f"Ошибка при воспроизведении {e}")
 
-    def plause_playback(self):
+    def play_current_sentence(self):
+        """
+        Воспроизведение текущего предложения
+        """
+        if 0 <= self.current_sentence_index < len(self.sentences):
+            sentence = self.sentences[self.current_sentence_index]
+            self.speaker.Speak(sentence, 1)
+            # Выделяем текущее предложение
+            self.highlight_current_sentence()
+
+    def check_playback_status(self):
+        """
+        Проверка статуса воспроизведения и переход к следующему предложению
+        """
+        if self.is_playing and not self.is_pause:
+            try:
+                # Проверяем, завершилось ли воспроизведение текущего предложения
+                status = self.speaker.Status
+                if hasattr(status, 'RunningState') and status.RunningState == 1:  # 1 = не воспроизводится
+                    # Переходим к следующему предложению
+                    self.current_sentence_index += 1
+                    
+                    if self.current_sentence_index < len(self.sentences):
+                        # Воспроизводим следующее предложение
+                        self.play_current_sentence()
+                    else:
+                        # Воспроизведение завершено
+                        self.stop_playback()
+                        
+            except Exception as e:
+                print(f"Ошибка при проверке статуса: {e}")
+
+    def pause_playback(self):
         """
         Пауза при воспроизведении
         """
         try:
             if self.speaker and self.is_playing:
-                self.speaker.Speak("", 3)
-                self.pause_position = 0
+                self.speaker.Speak("", 3)  # Останавливаем текущее воспроизведение
                 self.is_playing = False
                 self.is_pause = True
                 self.BtnPausePlay.setText("▶️")
+                # Обновляем состояние кнопок
+                self.update_button_states()
         except Exception as e:
             print(f"Ошибка паузы: {e}")
 
     def resume_playback(self):
         """
-        Возобновление воспроизведении
+        Возобновление воспроизведения с того места, где остановились
         """
         try:
             if self.speaker and self.is_pause:
-                text = self.textBrowser.toPlainText().strip()
-
-                if not text:
-                    print("Нет текста")
-                    return
-
-                self.speaker.Speak(text, 1)
-                self.is_playing = True
-                self.is_pause = False
-                self.BtnPausePlay.setText("⏸️")
+                if self.current_sentence_index < len(self.sentences):
+                    # Возобновляем с текущего предложения
+                    self.play_current_sentence()
+                    self.is_playing = True
+                    self.is_pause = False
+                    self.BtnPausePlay.setText("⏸️")
+                else:
+                    # Если дошли до конца, начинаем сначала
+                    self.current_sentence_index = 0
+                    self.play_current_sentence()
+                    self.is_playing = True
+                    self.is_pause = False
+                    self.BtnPausePlay.setText("⏸️")
+                # Обновляем состояние кнопок
+                self.update_button_states()
         except Exception as e:
-            print(f"Ошибка возобновлении воспроизведения: {e}")
+            print(f"Ошибка возобновления воспроизведения: {e}")
 
     def stop_playback(self):
         """
         Остановка воспроизведения
         """
         try:
-            if self.speaker and self.is_playing:
+            if self.speaker:
                 self.speaker.Speak("", 3)
                 self.is_playing = False
+                self.is_pause = False
+                self.current_sentence_index = 0
                 self.BtnPausePlay.setText("⏯️")
+                self.playback_timer.stop()
+                # Убираем выделение
+                self.clear_highlights()
+                # Обновляем состояние кнопок
+                self.update_button_states()
         except Exception as e:
-            print(f"Ошибка при остановки воспроизведения {e}")
+            print(f"Ошибка при остановке воспроизведения {e}")
 
     def previous_phrase(self):
         """
         Переход к предыдущей фразе
         """
-        # TODO: Реализовать логику воспроизведения
-        print('Назад нажата')
+        if not self.sentences or self.current_sentence_index <= 0:
+            return
+            
+        # Останавливаем текущее воспроизведение
+        if self.speaker and self.is_playing:
+            self.speaker.Speak("", 3)
+        
+        # Переходим к предыдущему предложению
+        self.current_sentence_index -= 1
+        
+        # Выделяем новое предложение
+        self.highlight_current_sentence()
+        
+        # Если воспроизведение было активно, продолжаем с нового предложения
+        if self.is_playing:
+            self.play_current_sentence()
+        elif self.is_pause:
+            # Если была пауза, остаемся в состоянии паузы
+            self.is_playing = False
+            self.is_pause = True
+        
+        # Обновляем состояние кнопок
+        self.update_button_states()
 
     def next_phrase(self):
         """
         Переход к следующей фразе
         """
-        # TODO: Реализовать логику воспроизведения
-        print('Далее нажата')
+        if not self.sentences or self.current_sentence_index >= len(self.sentences) - 1:
+            return
+            
+        # Останавливаем текущее воспроизведение
+        if self.speaker and self.is_playing:
+            self.speaker.Speak("", 3)
+        
+        # Переходим к следующему предложению
+        self.current_sentence_index += 1
+        
+        # Выделяем новое предложение
+        self.highlight_current_sentence()
+        
+        # Если воспроизведение было активно, продолжаем с нового предложения
+        if self.is_playing:
+            self.play_current_sentence()
+        elif self.is_pause:
+            # Если была пауза, остаемся в состоянии паузы
+            self.is_playing = False
+            self.is_pause = True
+        
+        # Обновляем состояние кнопок
+        self.update_button_states()
 
 
 if __name__ == "__main__":

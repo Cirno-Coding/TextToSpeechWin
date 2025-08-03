@@ -296,7 +296,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Воспроизведение текста "))
         self.label.setText(_translate("MainWindow", "Список голосов:"))
         self.textBrowser.setPlaceholderText(_translate("MainWindow", "Введите текст здесь..."))
         self.label_2.setText(_translate("MainWindow", "Скорость воспроизведения:"))
@@ -307,11 +307,12 @@ class Ui_MainWindow(object):
         self.BtnNext.setText(_translate("MainWindow", "⏩"))
         self.menuFile.setTitle(_translate("MainWindow", "Файл"))
         self.menuHelp.setTitle(_translate("MainWindow", "Справка"))
-        self.ActOpen.setText(_translate("MainWindow", "Открыть"))
+        self.ActOpen.setText(_translate("MainWindow", "📂 Открыть"))
+        self.ActOpen.setIconText(_translate("MainWindow", "📂 Открыть"))
         self.ActOpen.setShortcut(_translate("MainWindow", "Ctrl+O"))
-        self.ActSave.setText(_translate("MainWindow", "Сохранить"))
+        self.ActSave.setText(_translate("MainWindow", "💾 Сохранить"))
         self.ActSave.setShortcut(_translate("MainWindow", "Ctrl+S"))
-        self.ActExit.setText(_translate("MainWindow", "Выход"))
+        self.ActExit.setText(_translate("MainWindow", "🚪 Выход"))
         self.ActExit.setShortcut(_translate("MainWindow", "Ctrl+Q"))
         self.actionCopy.setText(_translate("MainWindow", "Копировать"))
         self.actionCopy.setShortcut(_translate("MainWindow", "Ctrl+C"))
@@ -319,4 +320,4 @@ class Ui_MainWindow(object):
         self.actionPaste.setShortcut(_translate("MainWindow", "Ctrl+V"))
         self.actionSelectAll.setText(_translate("MainWindow", "Выделить все"))
         self.actionSelectAll.setShortcut(_translate("MainWindow", "Ctrl+A"))
-        self.ActAbout.setText(_translate("MainWindow", "О программе"))
+        self.ActAbout.setText(_translate("MainWindow", "О программе 💡"))

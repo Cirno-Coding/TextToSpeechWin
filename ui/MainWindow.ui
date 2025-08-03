@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Воспроизведение текста </string>
   </property>
   <property name="styleSheet">
    <string notr="true">QMainWindow {
@@ -374,7 +374,10 @@ QStatusBar {
   <widget class="QStatusBar" name="statusbar"/>
   <action name="ActOpen">
    <property name="text">
-    <string>Открыть</string>
+    <string>📂 Открыть</string>
+   </property>
+   <property name="iconText">
+    <string>📂 Открыть</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -382,7 +385,7 @@ QStatusBar {
   </action>
   <action name="ActSave">
    <property name="text">
-    <string>Сохранить</string>
+    <string>💾 Сохранить</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -390,7 +393,7 @@ QStatusBar {
   </action>
   <action name="ActExit">
    <property name="text">
-    <string>Выход</string>
+    <string>🚪 Выход</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
@@ -422,7 +425,7 @@ QStatusBar {
   </action>
   <action name="ActAbout">
    <property name="text">
-    <string>О программе</string>
+    <string>О программе 💡</string>
    </property>
   </action>
  </widget>
