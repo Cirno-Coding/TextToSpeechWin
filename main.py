@@ -2,11 +2,13 @@ import sys
 import os
 import win32com.client
 from datetime import datetime
-from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
+from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QDialog, QVBoxLayout, QLabel, \
+    QPushButton, QHBoxLayout, QInputDialog, QLineEdit, QTextEdit
 from PyQt6.QtCore import Qt, QTimer, QUrl
-from PyQt6.QtGui import QTextCursor, QTextCharFormat, QColor, QFont, QDesktopServices
+from PyQt6.QtGui import QTextCursor, QTextCharFormat, QColor, QFont, QDesktopServices, QStandardItem, QStandardItemModel
 from ui.MainWindow import Ui_MainWindow
 from version import VERSION, VERSION_NAME, BUILD_DATE, AUTHOR, GITHUB_URL
+from database import DatabaseManager, Category, Text
 
 
 class AboutDialog(QDialog):
@@ -151,7 +153,36 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.update_speed_label()
         self.update_button_states()
 
+        # Инициализация базы данных с обработкой ошибок
+        try:
+            self.db = DatabaseManager()
+        except RuntimeError as e:
+            self.statusbar.showMessage(str(e), 10000)
+            self.db = DatabaseManager()
+
+        # Загрузка категорий
+        self.load_categories()
+
         self.textBrowser.setAcceptRichText(False)
+        self.textBrowser.focusOutEvent = self.save_current_text
+        self.current_text_id = None
+
+    def save_current_text(self, event):
+        """Сохранение текста при потере фокуса"""
+        if self.current_text_id is None:
+            return
+
+        current_content = self.textBrowser.toPlainText()
+        try:
+            # Получаем заголовок из списка
+            title = self.textsList.model().itemFromIndex(self.textsList.currentIndex()).text()
+            self.db.update_text(self.current_text_id, title, current_content)
+            self.statusbar.showMessage("Текст успешно сохранён", 3000)
+        except Exception as e:
+            self.statusbar.showMessage(f"Ошибка сохранения текста: {str(e)}", 5000)
+
+        # Вызываем оригинальный обработчик события
+        super(QTextEdit, self.textBrowser).focusOutEvent(event)
 
     def update_button_states(self):
         """
@@ -205,24 +236,50 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return self.voice_list[ind]
         return None
 
+    def on_category_changed(self, index):
+        """Обработчик изменения выбранной категории"""
+        if index >= 0:
+            category_id = self.catList.itemData(index)
+            self.load_texts_for_category(category_id)
+            if self.textsList.model().rowCount() > 0:
+                self.textsList.setCurrentIndex(self.textsList.model().index(0, 0))
+                self.on_text_selected(self.textsList.currentIndex())
+
+    def add_new_category(self):
+        """Добавление новой категории"""
+        text, ok = QInputDialog.getText(
+            self,
+            "Новая категория",
+            "Введите название категории:",
+            QLineEdit.EchoMode.Normal,
+            ""
+        )
+        if ok and text:
+            try:
+                cat_id = self.db.add_category(text)
+                self.catList.addItem(text, cat_id)
+                self.catList.setCurrentText(self.catList.count() - 1)
+            except Exception as e:
+                self.statusbar.showMessage(f"Ошибка создания категории: {str(e)}", 5000)
+
     def setup_connections(self):
         """
         Установка соединений между элементами интерфейса
         """
         self.ValueSpeed.valueChanged.connect(self.update_speed_label)
+        self.catList.currentIndexChanged.connect(self.on_category_changed)
 
         self.BtnPausePlay.clicked.connect(self.toggle_play_pause)
         self.BtnStop.clicked.connect(self.stop_playback)
         self.BtnPrevious.clicked.connect(self.previous_phrase)
         self.BtnNext.clicked.connect(self.next_phrase)
+
+        self.newCat.clicked.connect(self.add_new_category)
         
         # Обработчик изменения текста
         self.textBrowser.textChanged.connect(self.update_button_states)
         
         # Подключение действий меню
-        self.ActOpen.triggered.connect(self.open_file)
-        self.ActSave.triggered.connect(self.save_file)
-        self.ActExit.triggered.connect(self.exit_application)
         self.ActAbout.triggered.connect(self.show_about_dialog)
 
     def update_speed_label(self):
@@ -513,113 +570,90 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Обновляем состояние кнопок
         self.update_button_states()
 
-    def save_file(self):
-        """
-        Сохранение текста в файл
-        """
-        try:
-            text_content = self.textBrowser.toPlainText()
-            if text_content:
-                # Создаем папку texts, если её нет
-                texts_dir = os.path.join(os.getcwd(), "texts")
-                if not os.path.exists(texts_dir):
-                    os.makedirs(texts_dir)
-
-                # Генерируем имя файла по умолчанию
-                current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-                default_filename = f"Текст от {current_time}.txt"
-                default_path = os.path.join(texts_dir, default_filename)
-
-                # Открываем диалог сохранения
-                file_path, _ = QFileDialog.getSaveFileName(
-                    self,
-                    "Сохранить текст",
-                    default_path,
-                    "Текстовые файлы (*.txt)"
-                )
-
-                if file_path:
-                    # Сохраняем содержимое QTextEdit в файл
-                    with open(file_path, 'w', encoding='utf-8') as file:
-                        file.write(text_content)
-
-                    # Очищаем QTextEdit
-                    self.textBrowser.clear()
-
-                    # Останавливаем воспроизведение, если оно активно
-                    if self.is_playing or self.is_pause:
-                        self.stop_playback()
-                
-        except Exception as e:
-            QMessageBox.critical(self, "Ошибка", f"Ошибка при сохранении файла: {e}")
-
-    def open_file(self):
-        """
-        Открытие текстового файла
-        """
-        try:
-            # Проверяем, есть ли текст в QTextEdit
-            current_text = self.textBrowser.toPlainText().strip()
-            
-            if current_text:
-                # Спрашиваем пользователя о сохранении текущего текста
-                reply = QMessageBox.question(
-                    self,
-                    "Сохранить текст",
-                    "Хотите сохранить текущий текст?",
-                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                    QMessageBox.StandardButton.Yes
-                )
-                
-                if reply == QMessageBox.StandardButton.Yes:
-                    # Сохраняем текущий текст
-                    self.save_file()
-                    # Если пользователь отменил сохранение, не открываем новый файл
-                    if self.textBrowser.toPlainText().strip():
-                        return
-                else:
-                    # Очищаем QTextEdit
-                    self.textBrowser.clear()
-                    # Останавливаем воспроизведение, если оно активно
-                    if self.is_playing or self.is_pause:
-                        self.stop_playback()
-            
-            # Открываем диалог выбора файла
-            file_path, _ = QFileDialog.getOpenFileName(
-                self,
-                "Открыть текстовый файл",
-                os.path.join(os.getcwd(), "texts"),
-                "Текстовые файлы (*.txt)"
-            )
-            
-            if file_path:
-                # Читаем содержимое файла
-                with open(file_path, 'r', encoding='utf-8') as file:
-                    text_content = file.read()
-                
-                # Загружаем текст в QTextEdit
-                self.textBrowser.setPlainText(text_content)
-                
-        except Exception as e:
-            QMessageBox.critical(self, "Ошибка", f"Ошибка при открытии файла: {e}")
-
-    def exit_application(self):
-        """
-        Выход из приложения
-        """
-        # Останавливаем воспроизведение, если оно активно
-        if self.is_playing or self.is_pause:
-            self.stop_playback()
-        
-        # Закрываем приложение
-        self.close()
-
     def show_about_dialog(self):
         """
         Показывает диалог "О программе"
         """
         about_dialog = AboutDialog(self)
         about_dialog.exec()
+
+    def load_categories(self):
+        """Загрузка категорий из базы данных"""
+        try:
+            categories = self.db.get_all_categories()
+            self.catList.clear()
+            for cat_id, name in categories:
+                self.catList.addItem(name, cat_id)
+            if categories:
+                self.load_texts_for_category(categories[0][0])
+                # Выбираем последний элемент ("Новый текст") если список пуст
+                if self.textsList.model().rowCount() > 0:
+                    self.textsList.setCurrentIndex(self.textsList.model().index(0, 0))
+                    self.on_text_selected(self.textsList.currentIndex())
+        except Exception as e:
+            self.statusbar.showMessage(f"Ошибка загрузки категорий: {str(e)}", 5000)
+
+    def load_texts_for_category(self, category_id):
+        """Загрузка текстов для выбранной категории"""
+        try:
+            texts = self.db.get_texts_by_category(category_id)
+            model = QStandardItemModel()
+            # Добавляем существующие тексты
+            for text_id, _, title, _ in texts:
+                item = QStandardItem(title)
+                item.setData(text_id, Qt.ItemDataRole.UserRole)
+                item.setEditable(False)
+                model.appendRow(item)
+            
+            # Добавляем специальный элемент для создания нового текста
+            new_item = QStandardItem("🖊️ Новый текст")
+            new_item.setData(-1, Qt.ItemDataRole.UserRole)
+            new_item.setForeground(QColor(0, 255, 255))  # Голубой цвет
+            model.appendRow(new_item)
+
+            self.textsList.setModel(model)
+            self.textsList.clicked.connect(self.on_text_selected)
+        except Exception as e:
+            self.statusbar.showMessage(f"Ошибка загрузки текстов: {str(e)}", 5000)
+
+    def on_text_selected(self, index):
+        """Обработчик выбора текста в списке"""
+        try:
+            model = self.textsList.model()
+            text_id = model.data(index, Qt.ItemDataRole.UserRole)
+
+            if text_id == -1:
+                text, ok = QInputDialog(
+                    self,
+                    "Новый текст",
+                    "Введите название текста:",
+                    QLineEdit.EchoMode.Normal,
+                    ""
+                )
+                if ok and text:
+                    try:
+                        # Получаем текущую категорию
+                        cat_index = self.catList.currentIndex()
+                        category_id = self.catList.itemData(cat_index)
+
+                        # Создаём новый текст в БД
+                        new_id = self.db.save_text(category_id, text_id, "")
+                        self.current_text_id = new_id
+                        # Обновляем список текстов
+                        self.load_texts_for_category(category_id)
+                        # Выбираем новый текст в списке
+                        self.textsList.setCurrentIndex(model.index(model.rowCount() - 2, 0))
+                        self.textBrowser.setFocus()
+                    except Exception as e:
+                        self.statusbar.showMessage(f"Ошибка создания текста: {str(e)}", 5000)
+                return
+
+            text_content = self.db.get_text_content(text_id)
+            self.current_text_id = text_id  # Сохраняем ID текущего текста
+            self.textBrowser.setPlainText(text_content)
+            self.textBrowser.setFocus()
+        except Exception as e:
+            self.statusbar.showMessage(f"Ошибка загрузки текста: {str(e)}", 5000)
 
 
 if __name__ == "__main__":

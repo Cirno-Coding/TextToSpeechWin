@@ -119,8 +119,8 @@ QPushButton {
     color: #ffffff;
     font-weight: bold;
     font-size: 14pt;
-    min-width: 60px;
-    min-height: 50px;
+    min-width: 30px;
+    min-height: 20px;
 }
 
 QPushButton:hover {
@@ -202,85 +202,208 @@ QStatusBar {
     background: rgba(0, 0, 0, 0.8);
     border-top: 2px solid #00ffff;
     color: #00ffff;
-}</string>
+}
+
+QToolButton {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #1a1a2e, stop:1 #16213e);
+    border: 2px solid #00ffff;
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 10pt;
+}
+
+QToolButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #00ffff, stop:1 #0080ff);
+    color: #000000;
+    box-shadow: 0 0 15px #00ffff;
+}
+
+QToolButton:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #0080ff, stop:1 #00ffff);
+    border-color: #ffffff;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+QToolButton:disabled {
+    background: rgba(100, 100, 100, 0.3);
+    border-color: #666666;
+    color: #666666;
+}
+
+QListView {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #00ffff;
+    border-radius: 10px;
+    padding: 10px;
+    color: #ffffff;
+    font-size: 11pt;
+    selection-background-color: #00ffff;
+    selection-color: #000000;
+    outline: none;
+}
+
+QListView::item {
+    background: transparent;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin: 2px 0;
+}
+
+QListView::item:hover {
+    background: rgba(0, 255, 255, 0.2);
+    border: 1px solid #00ffff;
+}
+
+QListView::item:selected {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #00ffff, stop:1 #0080ff);
+    color: #000000;
+    font-weight: bold;
+    box-shadow: 0 0 10px #00ffff;
+}
+
+QListView::item:selected:active {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #0080ff, stop:1 #00ffff);
+}
+
+QSplitter::handle {
+    background: #00ffff;
+    width: 3px;
+}
+
+QSplitter::handle:hover {
+    background: #ffffff;
+    box-shadow: 0 0 10px #00ffff;
+}
+
+QStatusBar {
+    background: rgba(0, 0, 0, 0.8);
+    border-top: 2px solid #00ffff;
+    color: #00ffff;
+    font-weight: bold;
+}
+</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="label_3">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
-         <string>Список голосов:</string>
+         <string>Категория:</string>
         </property>
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
+       <widget class="QComboBox" name="catList"/>
       </item>
       <item>
-       <widget class="QComboBox" name="VoicesList">
-        <property name="minimumSize">
-         <size>
-          <width>512</width>
-          <height>0</height>
-         </size>
+       <widget class="QToolButton" name="newCat">
+        <property name="toolTip">
+         <string>Создать новую категорию (произведение)</string>
+        </property>
+        <property name="text">
+         <string>📝 Добавить категорию</string>
         </property>
        </widget>
       </item>
      </layout>
     </item>
     <item>
-     <widget class="QTextEdit" name="textBrowser">
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="placeholderText">
-       <string>Введите текст здесь...</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
       <item>
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Скорость воспроизведения:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSlider" name="ValueSpeed">
-        <property name="minimum">
-         <number>10</number>
-        </property>
-        <property name="maximum">
-         <number>20</number>
-        </property>
-        <property name="pageStep">
-         <number>2</number>
+       <widget class="QSplitter" name="splitter">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>362</height>
+         </size>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
+        <widget class="QListView" name="textsList"/>
+        <widget class="QTextEdit" name="textBrowser">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="placeholderText">
+          <string>Введите текст здесь...</string>
+         </property>
+        </widget>
        </widget>
       </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
-       <widget class="QLabel" name="PrintValueSpeed">
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Список голосов:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="VoicesList">
+          <property name="minimumSize">
+           <size>
+            <width>256</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Скорость воспроизведения:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSlider" name="ValueSpeed">
+          <property name="minimum">
+           <number>10</number>
+          </property>
+          <property name="maximum">
+           <number>20</number>
+          </property>
+          <property name="pageStep">
+           <number>2</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="PrintValueSpeed">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
@@ -288,26 +411,37 @@ QStatusBar {
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
        <widget class="QPushButton" name="BtnPrevious">
+        <property name="minimumSize">
+         <size>
+          <width>74</width>
+          <height>48</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>78</width>
+          <height>78</height>
+         </size>
+        </property>
         <property name="text">
          <string>⏪</string>
         </property>
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
+       <widget class="QPushButton" name="BtnStop">
+        <property name="minimumSize">
          <size>
-          <width>40</width>
-          <height>20</height>
+          <width>74</width>
+          <height>48</height>
          </size>
         </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="BtnStop">
+        <property name="maximumSize">
+         <size>
+          <width>78</width>
+          <height>78</height>
+         </size>
+        </property>
         <property name="text">
          <string>⏹️</string>
         </property>
@@ -315,26 +449,37 @@ QStatusBar {
       </item>
       <item>
        <widget class="QPushButton" name="BtnPausePlay">
+        <property name="minimumSize">
+         <size>
+          <width>74</width>
+          <height>48</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>78</width>
+          <height>78</height>
+         </size>
+        </property>
         <property name="text">
          <string>⏯️</string>
         </property>
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
+       <widget class="QPushButton" name="BtnNext">
+        <property name="minimumSize">
          <size>
-          <width>40</width>
-          <height>20</height>
+          <width>74</width>
+          <height>48</height>
          </size>
         </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="BtnNext">
+        <property name="maximumSize">
+         <size>
+          <width>78</width>
+          <height>78</height>
+         </size>
+        </property>
         <property name="text">
          <string>⏩</string>
         </property>
@@ -357,10 +502,7 @@ QStatusBar {
     <property name="title">
      <string>Файл</string>
     </property>
-    <addaction name="ActOpen"/>
-    <addaction name="ActSave"/>
-    <addaction name="separator"/>
-    <addaction name="ActExit"/>
+    <addaction name="ActExport"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -383,9 +525,9 @@ QStatusBar {
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="ActSave">
+  <action name="ActExport">
    <property name="text">
-    <string>💾 Сохранить</string>
+    <string>💾 Экспорт</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>

@@ -118,8 +118,8 @@ class Ui_MainWindow(object):
 "    color: #ffffff;\n"
 "    font-weight: bold;\n"
 "    font-size: 14pt;\n"
-"    min-width: 60px;\n"
-"    min-height: 50px;\n"
+"    min-width: 30px;\n"
+"    min-height: 20px;\n"
 "}\n"
 "\n"
 "QPushButton:hover {\n"
@@ -201,27 +201,139 @@ class Ui_MainWindow(object):
 "    background: rgba(0, 0, 0, 0.8);\n"
 "    border-top: 2px solid #00ffff;\n"
 "    color: #00ffff;\n"
-"}")
+"}\n"
+"\n"
+"QToolButton {\n"
+"    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
+"        stop:0 #1a1a2e, stop:1 #16213e);\n"
+"    border: 2px solid #00ffff;\n"
+"    border-radius: 8px;\n"
+"    padding: 8px 12px;\n"
+"    color: #ffffff;\n"
+"    font-weight: bold;\n"
+"    font-size: 10pt;\n"
+"}\n"
+"\n"
+"QToolButton:hover {\n"
+"    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
+"        stop:0 #00ffff, stop:1 #0080ff);\n"
+"    color: #000000;\n"
+"    box-shadow: 0 0 15px #00ffff;\n"
+"}\n"
+"\n"
+"QToolButton:pressed {\n"
+"    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
+"        stop:0 #0080ff, stop:1 #00ffff);\n"
+"    border-color: #ffffff;\n"
+"    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);\n"
+"}\n"
+"\n"
+"QToolButton:disabled {\n"
+"    background: rgba(100, 100, 100, 0.3);\n"
+"    border-color: #666666;\n"
+"    color: #666666;\n"
+"}\n"
+"\n"
+"QListView {\n"
+"    background: rgba(0, 0, 0, 0.8);\n"
+"    border: 2px solid #00ffff;\n"
+"    border-radius: 10px;\n"
+"    padding: 10px;\n"
+"    color: #ffffff;\n"
+"    font-size: 11pt;\n"
+"    selection-background-color: #00ffff;\n"
+"    selection-color: #000000;\n"
+"    outline: none;\n"
+"}\n"
+"\n"
+"QListView::item {\n"
+"    background: transparent;\n"
+"    padding: 8px 12px;\n"
+"    border-radius: 6px;\n"
+"    margin: 2px 0;\n"
+"}\n"
+"\n"
+"QListView::item:hover {\n"
+"    background: rgba(0, 255, 255, 0.2);\n"
+"    border: 1px solid #00ffff;\n"
+"}\n"
+"\n"
+"QListView::item:selected {\n"
+"    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
+"        stop:0 #00ffff, stop:1 #0080ff);\n"
+"    color: #000000;\n"
+"    font-weight: bold;\n"
+"    box-shadow: 0 0 10px #00ffff;\n"
+"}\n"
+"\n"
+"QListView::item:selected:active {\n"
+"    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
+"        stop:0 #0080ff, stop:1 #00ffff);\n"
+"}\n"
+"\n"
+"QSplitter::handle {\n"
+"    background: #00ffff;\n"
+"    width: 3px;\n"
+"}\n"
+"\n"
+"QSplitter::handle:hover {\n"
+"    background: #ffffff;\n"
+"    box-shadow: 0 0 10px #00ffff;\n"
+"}\n"
+"\n"
+"QStatusBar {\n"
+"    background: rgba(0, 0, 0, 0.8);\n"
+"    border-top: 2px solid #00ffff;\n"
+"    color: #00ffff;\n"
+"    font-weight: bold;\n"
+"}\n"
+"")
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
-        self.verticalLayout.setObjectName("verticalLayout")
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.centralwidget)
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        self.label_3 = QtWidgets.QLabel(parent=self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_3.sizePolicy().hasHeightForWidth())
+        self.label_3.setSizePolicy(sizePolicy)
+        self.label_3.setObjectName("label_3")
+        self.horizontalLayout_5.addWidget(self.label_3)
+        self.catList = QtWidgets.QComboBox(parent=self.centralwidget)
+        self.catList.setObjectName("catList")
+        self.horizontalLayout_5.addWidget(self.catList)
+        self.newCat = QtWidgets.QToolButton(parent=self.centralwidget)
+        self.newCat.setObjectName("newCat")
+        self.horizontalLayout_5.addWidget(self.newCat)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_5)
+        self.horizontalLayout_7 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_7.setObjectName("horizontalLayout_7")
+        self.splitter = QtWidgets.QSplitter(parent=self.centralwidget)
+        self.splitter.setMinimumSize(QtCore.QSize(0, 362))
+        self.splitter.setOrientation(QtCore.Qt.Orientation.Horizontal)
+        self.splitter.setObjectName("splitter")
+        self.textsList = QtWidgets.QListView(parent=self.splitter)
+        self.textsList.setObjectName("textsList")
+        self.textBrowser = QtWidgets.QTextEdit(parent=self.splitter)
+        self.textBrowser.setStyleSheet("")
+        self.textBrowser.setObjectName("textBrowser")
+        self.horizontalLayout_7.addWidget(self.splitter)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_7)
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setObjectName("label")
         self.horizontalLayout.addWidget(self.label)
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
-        self.horizontalLayout.addItem(spacerItem)
         self.VoicesList = QtWidgets.QComboBox(parent=self.centralwidget)
-        self.VoicesList.setMinimumSize(QtCore.QSize(512, 0))
+        self.VoicesList.setMinimumSize(QtCore.QSize(256, 0))
         self.VoicesList.setObjectName("VoicesList")
         self.horizontalLayout.addWidget(self.VoicesList)
-        self.verticalLayout.addLayout(self.horizontalLayout)
-        self.textBrowser = QtWidgets.QTextEdit(parent=self.centralwidget)
-        self.textBrowser.setStyleSheet("")
-        self.textBrowser.setObjectName("textBrowser")
-        self.verticalLayout.addWidget(self.textBrowser)
+        self.horizontalLayout_4.addLayout(self.horizontalLayout)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.label_2 = QtWidgets.QLabel(parent=self.centralwidget)
@@ -237,26 +349,31 @@ class Ui_MainWindow(object):
         self.PrintValueSpeed = QtWidgets.QLabel(parent=self.centralwidget)
         self.PrintValueSpeed.setObjectName("PrintValueSpeed")
         self.horizontalLayout_2.addWidget(self.PrintValueSpeed)
-        self.verticalLayout.addLayout(self.horizontalLayout_2)
+        self.horizontalLayout_4.addLayout(self.horizontalLayout_2)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_4)
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.BtnPrevious = QtWidgets.QPushButton(parent=self.centralwidget)
+        self.BtnPrevious.setMinimumSize(QtCore.QSize(74, 48))
+        self.BtnPrevious.setMaximumSize(QtCore.QSize(78, 78))
         self.BtnPrevious.setObjectName("BtnPrevious")
         self.horizontalLayout_3.addWidget(self.BtnPrevious)
-        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
-        self.horizontalLayout_3.addItem(spacerItem1)
         self.BtnStop = QtWidgets.QPushButton(parent=self.centralwidget)
+        self.BtnStop.setMinimumSize(QtCore.QSize(74, 48))
+        self.BtnStop.setMaximumSize(QtCore.QSize(78, 78))
         self.BtnStop.setObjectName("BtnStop")
         self.horizontalLayout_3.addWidget(self.BtnStop)
         self.BtnPausePlay = QtWidgets.QPushButton(parent=self.centralwidget)
+        self.BtnPausePlay.setMinimumSize(QtCore.QSize(74, 48))
+        self.BtnPausePlay.setMaximumSize(QtCore.QSize(78, 78))
         self.BtnPausePlay.setObjectName("BtnPausePlay")
         self.horizontalLayout_3.addWidget(self.BtnPausePlay)
-        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
-        self.horizontalLayout_3.addItem(spacerItem2)
         self.BtnNext = QtWidgets.QPushButton(parent=self.centralwidget)
+        self.BtnNext.setMinimumSize(QtCore.QSize(74, 48))
+        self.BtnNext.setMaximumSize(QtCore.QSize(78, 78))
         self.BtnNext.setObjectName("BtnNext")
         self.horizontalLayout_3.addWidget(self.BtnNext)
-        self.verticalLayout.addLayout(self.horizontalLayout_3)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_3)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(parent=MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 38))
@@ -271,22 +388,13 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.ActOpen = QtGui.QAction(parent=MainWindow)
         self.ActOpen.setObjectName("ActOpen")
-        self.ActSave = QtGui.QAction(parent=MainWindow)
-        self.ActSave.setObjectName("ActSave")
+        self.ActExport = QtGui.QAction(parent=MainWindow)
+        self.ActExport.setObjectName("ActExport")
         self.ActExit = QtGui.QAction(parent=MainWindow)
         self.ActExit.setObjectName("ActExit")
-        self.actionCopy = QtGui.QAction(parent=MainWindow)
-        self.actionCopy.setObjectName("actionCopy")
-        self.actionPaste = QtGui.QAction(parent=MainWindow)
-        self.actionPaste.setObjectName("actionPaste")
-        self.actionSelectAll = QtGui.QAction(parent=MainWindow)
-        self.actionSelectAll.setObjectName("actionSelectAll")
         self.ActAbout = QtGui.QAction(parent=MainWindow)
         self.ActAbout.setObjectName("ActAbout")
-        self.menuFile.addAction(self.ActOpen)
-        self.menuFile.addAction(self.ActSave)
-        self.menuFile.addSeparator()
-        self.menuFile.addAction(self.ActExit)
+        self.menuFile.addAction(self.ActExport)
         self.menuHelp.addAction(self.ActAbout)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
@@ -297,8 +405,11 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Воспроизведение текста "))
-        self.label.setText(_translate("MainWindow", "Список голосов:"))
+        self.label_3.setText(_translate("MainWindow", "Категория:"))
+        self.newCat.setToolTip(_translate("MainWindow", "Создать новую категорию (произведение)"))
+        self.newCat.setText(_translate("MainWindow", "📝 Добавить категорию"))
         self.textBrowser.setPlaceholderText(_translate("MainWindow", "Введите текст здесь..."))
+        self.label.setText(_translate("MainWindow", "Список голосов:"))
         self.label_2.setText(_translate("MainWindow", "Скорость воспроизведения:"))
         self.PrintValueSpeed.setText(_translate("MainWindow", "TextLabel"))
         self.BtnPrevious.setText(_translate("MainWindow", "⏪"))
@@ -310,14 +421,8 @@ class Ui_MainWindow(object):
         self.ActOpen.setText(_translate("MainWindow", "📂 Открыть"))
         self.ActOpen.setIconText(_translate("MainWindow", "📂 Открыть"))
         self.ActOpen.setShortcut(_translate("MainWindow", "Ctrl+O"))
-        self.ActSave.setText(_translate("MainWindow", "💾 Сохранить"))
-        self.ActSave.setShortcut(_translate("MainWindow", "Ctrl+S"))
+        self.ActExport.setText(_translate("MainWindow", "💾 Экспорт"))
+        self.ActExport.setShortcut(_translate("MainWindow", "Ctrl+S"))
         self.ActExit.setText(_translate("MainWindow", "🚪 Выход"))
         self.ActExit.setShortcut(_translate("MainWindow", "Ctrl+Q"))
-        self.actionCopy.setText(_translate("MainWindow", "Копировать"))
-        self.actionCopy.setShortcut(_translate("MainWindow", "Ctrl+C"))
-        self.actionPaste.setText(_translate("MainWindow", "Вставить"))
-        self.actionPaste.setShortcut(_translate("MainWindow", "Ctrl+V"))
-        self.actionSelectAll.setText(_translate("MainWindow", "Выделить все"))
-        self.actionSelectAll.setShortcut(_translate("MainWindow", "Ctrl+A"))
         self.ActAbout.setText(_translate("MainWindow", "О программе 💡"))
