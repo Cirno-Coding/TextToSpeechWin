@@ -29,11 +29,11 @@ jobs:
               match = re.search(rf'^{var}\s*=\s*[\'"]([^\'"]+)[\'"]', content, re.MULTILINE)
               return match.group(1) if match else ""
 
-          print("VERSION="+extract_var("VERSION"))
-          print("VERSION_NAME="+extract_var("VERSION_NAME"))
-          print("BUILD_DATE="+extract_var("BUILD_DATE"))
-          print("AUTHOR="+extract_var("AUTHOR"))
-          print("GITHUB_URL="+extract_var("GITHUB_URL"))
+          print(f"::set-output name=VERSION::{extract_var('VERSION')}")
+          print(f"::set-output name=VERSION_NAME::{extract_var('VERSION_NAME')}")
+          print(f"::set-output name=BUILD_DATE::{extract_var('BUILD_DATE')}")
+          print(f"::set-output name=AUTHOR::{extract_var('AUTHOR')}")
+          print(f"::set-output name=GITHUB_URL::{extract_var('GITHUB_URL')}")
         shell: python
         # выводим для последующего использования
 
@@ -55,6 +55,7 @@ jobs:
           name: ${{ github.ref_name }} - ${{ steps.version_info.outputs.VERSION_NAME }}
           body: |
             Версия: ${{ steps.version_info.outputs.VERSION }}
+            Имя версии: ${{ steps.version_info.outputs.VERSION_NAME }}
             Дата сборки: ${{ steps.version_info.outputs.BUILD_DATE }}
             Автор: ${{ steps.version_info.outputs.AUTHOR }}
             Ссылка на репозиторий: ${{ steps.version_info.outputs.GITHUB_URL }}
