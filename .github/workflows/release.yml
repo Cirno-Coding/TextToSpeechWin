@@ -45,14 +45,7 @@ jobs:
 
       - name: Build EXE
         run: |
-          pyinstaller --noconsole --onefile ^
-            --name "Воспроизведение текста" ^
-            --icon=main.ico ^
-            --add-data "ui;ui" ^
-            --hidden-import win32com ^
-            --hidden-import win32com.client ^
-            --hidden-import pythoncom ^
-            main.py
+          pyinstaller --noconsole --onefile --name "Воспроизведение текста" --icon=main.ico --add-data "ui;ui" --hidden-import win32com --hidden-import win32com.client --hidden-import pythoncom main.py
 
       - name: Create GitHub Release
         id: create_release
