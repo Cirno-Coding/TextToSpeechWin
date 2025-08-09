@@ -359,7 +359,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         for i, char in enumerate(text):
             current_sentence += char
-            if char in '.!?,:;':
+            if char in '.!?\n:;':
                 sentences.append(current_sentence.strip())
                 positions.append((current_start, i + 1))
                 current_sentence = ""
