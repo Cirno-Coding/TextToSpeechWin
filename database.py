@@ -31,7 +31,7 @@ class DatabaseManager:
             CREATE TABLE categories (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                created_at DATETIME DEFAULT (datetime('now', 'localtime'))
             )
         ''')
 
@@ -42,8 +42,8 @@ class DatabaseManager:
                 title TEXT NOT NULL,
                 content TEXT NOT NULL,
                 sort_index INTEGER DEFAULT 0,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                created_at DATETIME DEFAULT (datetime('now', 'localtime')),
+                updated_at DATETIME DEFAULT (datetime('now', 'localtime')),
                 FOREIGN KEY(category_id) REFERENCES categories(id)
             )
         ''')
@@ -128,7 +128,7 @@ class DatabaseManager:
         cursor = self.conn.cursor()
         cursor.execute('''
             UPDATE texts
-            SET title = ?, content = ?, updated_at = CURRENT_TIMESTAMP
+            SET title = ?, content = ?, updated_at = (datetime('now', 'localtime'))
             WHERE id = ?
         ''', (title, content, text_id))
         self.conn.commit()

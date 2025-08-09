@@ -1,7 +1,7 @@
+import os.path
 import sys
-import os
 import win32com.client
-from datetime import datetime
+from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QDialog, QVBoxLayout, QLabel, \
     QPushButton, QHBoxLayout, QInputDialog, QLineEdit, QTextEdit
 from PyQt6.QtCore import Qt, QTimer, QUrl
@@ -84,7 +84,7 @@ class AboutDialog(QDialog):
         • Навигация по тексту (переход между предложениями)
         • Визуальное выделение текущего воспроизводимого текста
         • Регулировка скорости воспроизведения
-        • Работа с файлами (сохранение и загрузка)
+        • Работа с файлами (экспорт категории в папку с текстами)
         • Современный интерфейс с темной темой
         """
         
@@ -281,6 +281,59 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         # Подключение действий меню
         self.ActAbout.triggered.connect(self.show_about_dialog)
+        self.ActExport.triggered.connect(self.export_category_texts)
+
+    def export_category_texts(self):
+        """Экспорт всех текстов категории в файлы"""
+        try:
+            category_index = self.catList.currentIndex()
+            if category_index == -1:
+                QMessageBox.warning(self, "Ошибка", "Сначала выберете категорию!")
+                return
+            category_id = self.catList.itemData(category_index)
+
+            # Запрашиваем папку для сохранения
+            folder_path = QFileDialog.getExistingDirectory(
+                self,
+                "Выберите папку для экспорта",
+                "",
+                QFileDialog.Option.ShowDirsOnly
+            )
+
+            if not folder_path:
+                return
+
+            # Получаем все тексты категории
+            texts = self.db.get_texts_by_category(category_id)
+            if not texts:
+                QMessageBox.information(self, "Информация", "В категории нет текстов для экспорта")
+                return
+
+            folder_path += '/' + self.catList.currentText()
+            if not os.path.isdir(folder_path):
+                os.mkdir(folder_path)
+
+            # Сохраняем каждый текст в отдельный файл
+            for text in texts:
+                text_id, _, title, content = text
+
+                # Формируем безопасное имя
+                safe_title = "".join(i if i.isalnum() else "_" for i in title).rstrip("_")
+                file_path = f"{folder_path}/{safe_title}.txt"
+
+                try:
+                    with open(file_path, "w", encoding="utf-8") as f:
+                        f.write(content)
+                except Exception as e:
+                    self.statusbar.showMessage(f"Ошибка сохранения {title}: {str(e)}", 5000)
+            self.statusbar.showMessage(f"Успешно экспортировано {self.catList.currentText()}", 5000)
+            QMessageBox.information(
+                self, "Экспорт завершен",
+                f"Успешно сохранено {self.catList.currentText()} из {len(texts)} текстов\n"
+                f"в папку: {folder_path}"
+            )
+        except Exception as e:
+            self.statusbar.showMessage(self, f"Ошибка экспорта: {str(e)}", 5000)
 
     def update_speed_label(self):
         """
@@ -612,6 +665,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             model.appendRow(new_item)
 
             self.textsList.setModel(model)
+            self.textsList.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
+            self.textsList.scheduleDelayedItemsLayout()
+
             self.textsList.clicked.connect(self.on_text_selected)
         except Exception as e:
             self.statusbar.showMessage(f"Ошибка загрузки текстов: {str(e)}", 5000)
@@ -623,7 +679,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             text_id = model.data(index, Qt.ItemDataRole.UserRole)
 
             if text_id == -1:
-                text, ok = QInputDialog(
+                text, ok = QInputDialog.getText(
                     self,
                     "Новый текст",
                     "Введите название текста:",
@@ -637,7 +693,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         category_id = self.catList.itemData(cat_index)
 
                         # Создаём новый текст в БД
-                        new_id = self.db.save_text(category_id, text_id, "")
+                        new_id = self.db.save_text(category_id, text, "")
                         self.current_text_id = new_id
                         # Обновляем список текстов
                         self.load_texts_for_category(category_id)
@@ -648,8 +704,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         self.statusbar.showMessage(f"Ошибка создания текста: {str(e)}", 5000)
                 return
 
-            text_content = self.db.get_text_content(text_id)
-            self.current_text_id = text_id  # Сохраняем ID текущего текста
+            text_content = self.db.get_text_content(text_id)[0]
+            self.current_text_id = text_id
             self.textBrowser.setPlainText(text_content)
             self.textBrowser.setFocus()
         except Exception as e:
