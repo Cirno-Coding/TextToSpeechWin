@@ -27,7 +27,7 @@ jobs:
 
           def extract_var(var):
               match = re.search(rf'^{var}\s*=\s*[\'"]([^\'"]+)[\'"]', content, re.MULTILINE)
-              print(match.group(1) if match else "")
+              return match.group(1) if match else ""
 
           print("VERSION="+extract_var("VERSION"))
           print("VERSION_NAME="+extract_var("VERSION_NAME"))
